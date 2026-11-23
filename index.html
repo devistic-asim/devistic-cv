@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Devistic CV — Resume studio</title>
+    <meta
+      name="description"
+      content="Devistic CV is a private, in-browser resume studio. Write, auto-arrange, import, and export a CV without an account or an AI model."
+    />
+    <link rel="icon" href="%BASE_URL%favicon.png" type="image/png" />
+    <link rel="apple-touch-icon" href="%BASE_URL%apple-touch-icon.png" />
+    <meta name="theme-color" content="#F5F9FC" />
+    <script>
+      ;(function () {
+        try {
+          var choice = localStorage.getItem('devistic-theme') || 'system'
+          var dark =
+            choice === 'dark' ||
+            (choice !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+          var theme = dark ? 'dark' : 'light'
+          var root = document.documentElement
+          root.setAttribute('data-theme', theme)
+          root.style.colorScheme = theme
+          var meta = document.querySelector('meta[name="theme-color"]')
+          if (meta) meta.setAttribute('content', dark ? '#0B1220' : '#F5F9FC')
+        } catch (e) {}
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

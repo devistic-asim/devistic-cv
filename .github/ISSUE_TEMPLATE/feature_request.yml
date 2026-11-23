@@ -1,0 +1,19 @@
+name: Feature
+description: A change that would make Devistic CV more useful without adding an account, a server, or a model.
+title: "Feature: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What is awkward or missing today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: The smallest change that would help. Say if it should stay rule-based and on this device.
+    validations:
+      required: true
