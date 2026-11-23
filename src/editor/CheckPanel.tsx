@@ -1,5 +1,8 @@
+import { useEffect, useMemo, useState } from 'react'
 import { Badge } from '../components/ui'
+import { documentText, matchKeywords } from '../lib/keywords'
 import { scoreCv, type Check } from '../lib/score'
+import { TIPS } from '../lib/tips'
 import type { CVDocument } from '../lib/types'
 
 export function CheckPanel({
@@ -48,7 +51,8 @@ export function CheckPanel({
             </ul>
           </section>
         )
-      })}
+        })}
+      <JobMatch doc={doc} />
     </div>
   )
 }
@@ -63,4 +67,60 @@ function ScoreRing({ score }: { score: number }) {
       </span>
     </div>
   )
+}
+
+function JobMatch({ doc }: { doc: CVDocument }) {
+  const storageKey = `devistic-job:${doc.id}`
+  const [text, setText] = useState(() => readJob(storageKey))
+  useEffect(() => {
+    try {
+      if (text.trim()) sessionStorage.setItem(storageKey, text)
+      else sessionStorage.removeItem(storageKey)
+    } catch {
+      /* private mode */
+    }
+  }, [storageKey, text])
+  const matches = useMemo(() => (text.trim() ? matchKeywords(text, documentText(doc)) : []), [doc, text])
+  const found = matches.filter((item) => item.found).length
+  return (
+    <section className="rounded-md border border-line bg-surface p-3">
+      <h2 className="font-serif text-xl">Job words</h2>
+      <p className="mt-1 text-xs leading-relaxed text-muted">{TIPS.jobMatch}</p>
+      <label className="mt-3 block text-sm font-semibold" htmlFor="job-post">
+        Job post
+        <textarea
+          id="job-post"
+          className="mt-1 w-full rounded-md border border-line bg-bg px-3 py-2 text-sm font-normal text-text"
+          rows={5}
+          spellCheck
+          value={text}
+          placeholder="Paste the posting. It stays in this tab."
+          onChange={(event) => setText(event.target.value)}
+        />
+      </label>
+      {matches.length > 0 && (
+        <>
+          <p className="mt-2 text-sm font-semibold">
+            {found} of {matches.length} words already appear
+          </p>
+          <ul className="mt-2 flex flex-wrap gap-1.5">
+            {matches.map((item) => (
+              <li key={item.keyword}>
+                <Badge tone={item.found ? 'good' : 'highlight'}>{item.keyword}</Badge>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-2 text-xs text-muted">Green words are already in the CV. Yellow words are not. Add them only when they are true.</p>
+        </>
+      )}
+    </section>
+  )
+}
+
+function readJob(key: string) {
+  try {
+    return sessionStorage.getItem(key) ?? ''
+  } catch {
+    return ''
+  }
 }

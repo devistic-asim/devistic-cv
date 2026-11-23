@@ -4,8 +4,9 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Shell } from '../components/Shell'
 import { Button, Modal } from '../components/ui'
 import { ImportButton } from '../editor/fields'
-import { downloadJson } from '../lib/export'
+import { downloadJson, downloadJsonResume } from '../lib/export'
 import { sampleDocument } from '../lib/sample'
+import { TIPS } from '../lib/tips'
 import { templateMeta } from '../preview/templates'
 import { pushToast } from '../store/toast'
 import { useCvStore } from '../store/useCvStore'
@@ -33,7 +34,7 @@ export function Dashboard() {
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <h1 className="font-serif text-4xl">Documents</h1>
-            <p className="mt-2 text-muted">Every CV on this browser. Duplicate one when a role needs a different emphasis.</p>
+            <p className="mt-2 max-w-2xl text-sm text-muted">{TIPS.import}</p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Button type="button" onClick={() => navigate(`/editor/${create()}`)}>
@@ -81,6 +82,7 @@ export function Dashboard() {
                   <Copy size={14} /> Duplicate
                 </Button>
                 <Button type="button" size="sm" variant="ghost" onClick={() => downloadJson(doc)}>JSON</Button>
+                <Button type="button" size="sm" variant="ghost" onClick={() => downloadJsonResume(doc)}>JSON Resume</Button>
                 <Button type="button" size="sm" variant="danger" onClick={() => setPendingDelete(doc.id)}>
                   <Trash2 size={14} /> Delete
                 </Button>

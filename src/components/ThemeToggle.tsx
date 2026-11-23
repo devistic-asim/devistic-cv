@@ -11,7 +11,7 @@ const OPTIONS: { id: ThemeChoice; label: string; icon: typeof Sun }[] = [
 export function ThemeToggle({ compact = false }: { compact?: boolean }) {
   const [choice, setChoice] = useTheme()
   return (
-    <div className="inline-flex rounded-md border border-line bg-surface p-0.5" role="group" aria-label="Color theme">
+    <fieldset className="inline-flex rounded-md border border-line bg-surface p-0.5" aria-label="Color theme">
       {OPTIONS.map((option) => {
         const Icon = option.icon
         const active = choice === option.id
@@ -31,6 +31,6 @@ export function ThemeToggle({ compact = false }: { compact?: boolean }) {
           </button>
         )
       })}
-    </div>
+    </fieldset>
   )
 }

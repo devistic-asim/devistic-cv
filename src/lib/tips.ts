@@ -27,7 +27,15 @@ export const TIPS: Record<string, string> = {
   accent: 'The accent colors rules and small marks. Body text stays navy so the page stays readable in print.',
   spacing: 'If the CV spills by a few lines, tighten spacing before you cut a real achievement.',
   import:
-    'Import fills the editor for you to review. Complex PDFs, scanned pages, and unusual layouts will miss pieces — check every section.',
+    'Import fills the editor for you to review. PDF, DOCX, plain text, JSON Resume, LinkedIn JSON, and Devistic JSON all stay in this browser. Complex PDFs and scanned pages will miss pieces.',
+  jsonResume:
+    'Devistic JSON keeps the template, spacing, and photo. JSON Resume is the open schema other tools can read. A photo stored only on this device is left out of JSON Resume.',
+  jobMatch:
+    'Paste a job post. Devistic CV lists the words that already appear in your CV and the ones that do not. Nothing is rewritten, and the post is kept only for this browser tab.',
+  pages:
+    'If the CV spills by a few lines, fit it to one page before you cut a real achievement. That tightens type, spacing, and margins.',
+  clearData:
+    'This removes every CV, the theme choice, and the dismissed privacy note from this browser. Export JSON first if you want a copy.',
 }
 
 export const ACTION_VERBS = [

@@ -68,7 +68,7 @@ export function Landing() {
           {[
             ['01', 'Write', 'Personal details, summary, roles, study, skills, projects, certificates, languages, links, and any section you name.'],
             ['02', 'Arrange', 'Drag sections and entries. Or run auto-build: it picks a template, merges duplicates, and scales type toward one or two pages.'],
-            ['03', 'Export', 'PDF and PNG match the sheet. JSON round-trips the document. Print is the text version for applicant systems.'],
+            ['03', 'Export', 'PDF and PNG match the sheet. Devistic JSON keeps the design. JSON Resume is the open file other tools can read. Print is the text version for applicant systems.'],
           ].map(([index, title, body]) => (
             <article key={title}>
               <p className="text-xs font-semibold text-[var(--accent-ink)]">{index}</p>
@@ -110,7 +110,7 @@ export function Landing() {
         <div className="mx-auto grid max-w-6xl gap-8 px-4 py-14 lg:grid-cols-2">
           <div>
             <h2 className="font-serif text-3xl">A checklist with the reason attached</h2>
-            <p className="mt-3 text-muted">Each note names the rule: a missing email, a bullet past 28 words, a role with no number, a photo on a portal-friendly layout. You decide what to change.</p>
+            <p className="mt-3 text-muted">Each note names the rule: a missing email, a bullet past 28 words, a role with no number, a photo on a portal-friendly layout. Paste a job post in Check to see which of its words already appear. You decide what to change.</p>
             <p className="mt-3 text-muted">Example lines sit in a library by role. They are starters with brackets, not finished claims.</p>
           </div>
           <div className="rounded-lg border border-line bg-surface p-4">

@@ -1,18 +1,21 @@
 import { canonicalDate } from './dates'
 import {
   blankCertification,
+  blankCustomItem,
+  blankCustomSection,
   blankEducation,
   blankExperience,
   blankLanguage,
   blankLink,
   blankProject,
   blankSkill,
+  coerceDesign,
   emptyContent,
   STANDARD_TITLES,
 } from './defaults'
 import { uid } from './id'
 import { escapeHtml, plainToRich } from './richtext'
-import type { CVContent, CVDocument, ParseResult, SectionKey } from './types'
+import type { CVContent, CVDocument, DesignSettings, ParseResult, SectionKey } from './types'
 
 const SECTION_RULES: { key: SectionKey; re: RegExp }[] = [
   { key: 'summary', re: /^(professional\s+)?(summary|profile|about(\s+me)?|objective|career\s+summary|personal\s+statement)$/i },
@@ -578,7 +581,7 @@ function parseJsonResume(data: Record<string, unknown>): ParseResult {
     item.field = String(school.area ?? '')
     item.start = canonicalDate(String(school.startDate ?? ''))
     item.end = canonicalDate(String(school.endDate ?? ''))
-    item.details = plainToRich(asStrings(school.courses).join(', '))
+    item.details = plainToRich(String(school.summary ?? asStrings(school.courses).join(', ')))
     return item
   })
 
@@ -599,7 +602,10 @@ function parseJsonResume(data: Record<string, unknown>): ParseResult {
     const item = blankProject()
     item.name = String(project.name ?? '')
     item.url = String(project.url ?? '')
-    item.description = plainToRich([project.description, ...asStrings(project.highlights)].filter(Boolean).join('\n'))
+    item.role = asStrings(project.roles)[0] ?? ''
+    item.description = plainToRich(
+      [project.summary ?? project.description, ...asStrings(project.highlights)].filter(Boolean).join('\n'),
+    )
     item.start = canonicalDate(String(project.startDate ?? ''))
     item.end = canonicalDate(String(project.endDate ?? ''))
     return item
@@ -622,7 +628,64 @@ function parseJsonResume(data: Record<string, unknown>): ParseResult {
   })
 
   content.sectionTitles = { ...STANDARD_TITLES }
-  return { format: 'json-resume', content, warnings: content.personal.fullName ? [] : ['JSON Resume had no basics.name.'] }
+  addJsonResumeCustom(content, 'Volunteer', asArray(data.volunteer).map((item) => ({
+    title: String(item.position ?? ''),
+    subtitle: String(item.organization ?? ''),
+    meta: [item.startDate, item.endDate].filter(Boolean).join(' – '),
+    body: String(item.summary ?? ''),
+  })))
+  addJsonResumeCustom(content, 'Awards', asArray(data.awards).map((item) => ({
+    title: String(item.title ?? ''),
+    subtitle: String(item.awarder ?? ''),
+    meta: String(item.date ?? ''),
+    body: String(item.summary ?? ''),
+  })))
+  addJsonResumeCustom(content, 'Publications', asArray(data.publications).map((item) => ({
+    title: String(item.name ?? ''),
+    subtitle: String(item.publisher ?? ''),
+    meta: String(item.releaseDate ?? ''),
+    body: String(item.summary ?? ''),
+  })))
+
+  const devistic = readDevisticMeta(data.meta)
+  return {
+    format: 'json-resume',
+    content,
+    design: devistic.design,
+    name: devistic.name,
+    warnings: content.personal.fullName ? [] : ['JSON Resume had no basics.name.'],
+  }
+}
+
+function addJsonResumeCustom(
+  content: CVContent,
+  title: string,
+  items: { title: string; subtitle: string; meta: string; body: string }[],
+) {
+  const filled = items.filter((item) => item.title || item.subtitle || item.body)
+  if (!filled.length) return
+  const section = blankCustomSection(title)
+  section.items = filled.map((item) => {
+    const entry = blankCustomItem()
+    entry.title = item.title
+    entry.subtitle = item.subtitle
+    entry.meta = item.meta
+    entry.body = plainToRich(item.body)
+    return entry
+  })
+  content.custom.push(section)
+  content.sectionOrder.push(`custom:${section.id}`)
+}
+
+function readDevisticMeta(meta: unknown): { name?: string; design?: DesignSettings } {
+  if (!meta || typeof meta !== 'object') return {}
+  const devistic = (meta as Record<string, unknown>).devistic
+  if (!devistic || typeof devistic !== 'object') return {}
+  const record = devistic as Record<string, unknown>
+  return {
+    name: typeof record.name === 'string' ? record.name : undefined,
+    design: record.design && typeof record.design === 'object' ? coerceDesign(record.design as DesignSettings) : undefined,
+  }
 }
 
 function parseLinkedIn(data: Record<string, unknown>): ParseResult {

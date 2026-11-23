@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type MouseEvent, type ReactNode } from 'react'
+import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { packBlocks } from '../lib/autoLayout'
 import { visibleAccent } from '../lib/contrast'
 import { fontStack, LEVEL_LABELS, sectionLabel } from '../lib/defaults'
@@ -47,7 +47,7 @@ export function ResumePages({ doc, onPages }: { doc: CVDocument; onPages?: (coun
   const navy = meta.tone === 'navy-side'
 
   return (
-    <div className="flex flex-col items-center gap-6" onClick={onSectionClick}>
+    <div className="flex flex-col items-center gap-6">
       <div className="no-print pointer-events-none fixed top-0 -left-[12000px] opacity-0" aria-hidden>
         <Measure width={metrics.pxW} style={style} specs={header} refs={refs} />
         <Measure width={twoCol ? metrics.mainInner : metrics.singleInner} style={style} specs={main} refs={refs} />
@@ -117,9 +117,26 @@ function SideColumn({ navy, pad, ids, specs }: { navy: boolean; pad: number; ids
 
 function Block({ spec, gap }: { spec: Spec; gap: number }) {
   return (
-    <div data-cv-section={spec.section} style={{ paddingBottom: gap }}>
+    <button
+      type="button"
+      data-cv-section={spec.section}
+      aria-label={`Edit ${spec.section}`}
+      onClick={() => window.dispatchEvent(new CustomEvent('devistic-section', { detail: spec.section }))}
+      style={{
+        display: 'block',
+        width: '100%',
+        margin: 0,
+        padding: `0 0 ${gap}px`,
+        border: 0,
+        background: 'transparent',
+        color: 'inherit',
+        font: 'inherit',
+        textAlign: 'left',
+        cursor: 'pointer',
+      }}
+    >
       {spec.render()}
-    </div>
+    </button>
   )
 }
 
@@ -156,14 +173,6 @@ function samePack(
   b: { main: number[][]; side: number[][]; headerH: number },
 ) {
   return JSON.stringify(a) === JSON.stringify(b)
-}
-
-function onSectionClick(event: MouseEvent) {
-  const target = (event.target as HTMLElement).closest('[data-cv-section]')
-  if (!target) return
-  const section = target.getAttribute('data-cv-section')
-  if (!section) return
-  window.dispatchEvent(new CustomEvent('devistic-section', { detail: section }))
 }
 
 function paperStyle(design: DesignSettings): CSSProperties {
@@ -456,7 +465,7 @@ function Contact({
 
 function Photo({ src, shape, size }: { src: string; shape: PhotoShape; size: number }) {
   const radius = shape === 'round' ? '50%' : shape === 'rounded' ? '10px' : '2px'
-  return <img src={src} alt="Profile photo" style={{ width: size, height: size, objectFit: 'cover', borderRadius: radius, flex: 'none' }} />
+  return <img src={src} alt="Portrait" style={{ width: size, height: size, objectFit: 'cover', borderRadius: radius, flex: 'none' }} />
 }
 
 function Heading({ title, design, tone }: { title: string; design: DesignSettings; tone: 'paper' | 'navy' }) {

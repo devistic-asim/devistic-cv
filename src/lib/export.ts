@@ -1,5 +1,6 @@
 import { toPng } from 'html-to-image'
 import { jsPDF } from 'jspdf'
+import { toJsonResume } from './jsonResume'
 import { devisticPayload } from './parser'
 import type { CVDocument } from './types'
 
@@ -49,6 +50,11 @@ export async function downloadPng(doc: CVDocument) {
 export function downloadJson(doc: CVDocument) {
   const blob = new Blob([JSON.stringify(devisticPayload(doc), null, 2)], { type: 'application/json' })
   downloadBlob(`${slug(doc.name)}.json`, blob)
+}
+
+export function downloadJsonResume(doc: CVDocument) {
+  const blob = new Blob([JSON.stringify(toJsonResume(doc), null, 2)], { type: 'application/json' })
+  downloadBlob(`${slug(doc.name)}-json-resume.json`, blob)
 }
 
 export function printResume() {

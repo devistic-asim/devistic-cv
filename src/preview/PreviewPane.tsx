@@ -1,6 +1,7 @@
 import { Minus, Plus, Scaling } from 'lucide-react'
 import { useLayoutEffect, useRef, useState } from 'react'
 import { Button } from '../components/ui'
+import { TIPS } from '../lib/tips'
 import type { CVDocument } from '../lib/types'
 import { pageMetrics } from './templates'
 import { ResumePages } from './ResumePages'
@@ -52,7 +53,7 @@ export function PreviewPane({
         </span>
         <div className="flex items-center gap-1">
           {pages > 1 && onTighten && (
-            <Button type="button" size="sm" variant="secondary" onClick={onTighten}>
+            <Button type="button" size="sm" variant="secondary" onClick={onTighten} title={TIPS.pages}>
               Fit to one page
             </Button>
           )}
@@ -68,6 +69,7 @@ export function PreviewPane({
           </Button>
         </div>
       </div>
+      {pages > 1 && <p className="no-print border-b border-line bg-surface px-3 py-1.5 text-xs leading-relaxed text-muted">{TIPS.pages}</p>}
       <div className="px-4 py-6">
         <div className="preview-sizer mx-auto" style={{ width: metrics.pxW * scale, height: height * scale }}>
           <div ref={innerRef} className="preview-scale" data-preview-scale style={{ width: metrics.pxW, transform: `scale(${scale})`, transformOrigin: 'top left' }}>

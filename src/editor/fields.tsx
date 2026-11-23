@@ -16,6 +16,7 @@ import { Button, Modal } from '../components/ui'
 import { parseResumeFile } from '../lib/parser'
 import { PHRASE_GROUPS } from '../lib/phrases'
 import { sanitizeRich } from '../lib/richtext'
+import { TIPS } from '../lib/tips'
 import type { ParseResult, PhotoShape } from '../lib/types'
 
 export function RichField({
@@ -82,11 +83,11 @@ export function RichField({
         </div>
         <div
           ref={ref}
-          role="textbox"
           aria-multiline="true"
           aria-labelledby={`${fieldId}-label`}
           aria-describedby={hint ? `${fieldId}-hint` : undefined}
           contentEditable
+          spellCheck
           data-placeholder={placeholder}
           className="min-h-20 px-3 py-2 text-text outline-none"
           onInput={emit}
@@ -203,7 +204,7 @@ export function PhotoField({
       <span className="mb-1 block font-semibold">Profile photo</span>
       <div className="flex items-center gap-3">
         {photo ? (
-          <img src={photo} alt="Current profile photo" className="h-16 w-16 rounded-full object-cover" />
+          <img src={photo} alt="Portrait" className="h-16 w-16 rounded-full object-cover" />
         ) : (
           <div className="flex h-16 w-16 items-center justify-center rounded-full border border-dashed border-line text-xs text-muted">None</div>
         )}
@@ -234,7 +235,7 @@ export function PhotoField({
           )}
         </div>
       </div>
-      <p className="mt-1 text-xs text-muted">A photo is optional. Crop it square, then choose a round or square frame in Design.</p>
+      <p className="mt-1 text-xs leading-relaxed text-muted">{TIPS.photo}</p>
       <Modal open={open} onOpenChange={setOpen} title="Crop photo" description="Drag to frame the face. The page shape is set with the template.">
         <div className="relative h-72 overflow-hidden rounded-md bg-[#0B1220]">
           {source && (
@@ -254,13 +255,14 @@ export function PhotoField({
           Zoom
           <input className="mt-1 w-full" type="range" min={1} max={3} step={0.01} value={zoom} onChange={(event) => setZoom(Number(event.target.value))} />
         </label>
-        <div className="mt-3 flex gap-2" role="group" aria-label="Crop frame">
+        <fieldset className="mt-3 flex gap-2 border-0 p-0">
+          <legend className="sr-only">Crop frame</legend>
           {(['round', 'rounded', 'square'] as PhotoShape[]).map((option) => (
             <button key={option} type="button" aria-pressed={shape === option} className={`rounded-md border px-3 py-1 text-sm font-semibold capitalize ${shape === option ? 'border-primary bg-primary text-primary-fg' : 'border-line'}`} onClick={() => setShape(option)}>
               {option}
             </button>
           ))}
-        </div>
+        </fieldset>
         <Button
           className="mt-4"
           type="button"

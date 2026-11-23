@@ -255,7 +255,6 @@ export function Toaster() {
       {toasts.map((toast) => (
         <div
           key={toast.id}
-          role="status"
           className={cn(
             'pointer-events-auto rounded-md border px-3 py-2 text-sm shadow-[var(--shadow)]',
             toast.tone === 'warn' ? 'border-danger bg-elevated text-text' : 'border-line bg-elevated text-text',

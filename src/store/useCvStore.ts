@@ -1,12 +1,10 @@
-import { get, set } from 'idb-keyval'
 import { create } from 'zustand'
 import { autoArrange, type AutoOptions } from '../lib/autoLayout'
 import { coerceContent, coerceDesign, createDocument } from '../lib/defaults'
+import { clearDevisticStorage, readDocuments, writeDocuments } from '../lib/storage'
 import type { CVContent, CVDocument, DesignSettings } from '../lib/types'
 import type { ParseResult } from '../lib/types'
 import { pushToast } from './toast'
-
-const KEY = 'devistic-docs-v1'
 
 type Snapshot = { id: string; content: CVContent; design: DesignSettings }
 
@@ -25,6 +23,7 @@ type CvState = {
   undo: (id: string) => void
   redo: (id: string) => void
   importParsed: (result: ParseResult, options?: AutoOptions) => { id: string; notes: string[] }
+  clearLocal: () => void
 }
 
 let timer = 0
@@ -34,21 +33,14 @@ function queueSave() {
   window.clearTimeout(timer)
   timer = window.setTimeout(() => {
     const docs = useCvStore.getState().docs
-    void set(KEY, docs)
-      .then(() => useCvStore.setState({ saveState: 'saved' }))
-      .catch(() => {
-        useCvStore.setState({ saveState: 'saved' })
-        pushToast('Could not save on this device. Free some browser storage and try again.', 'warn')
-      })
+    try {
+      writeDocuments(localStorage, docs)
+      useCvStore.setState({ saveState: 'saved' })
+    } catch {
+      useCvStore.setState({ saveState: 'saved' })
+      pushToast('Could not save on this device. Export JSON, then remove a photo or an older CV.', 'warn')
+    }
   }, 280)
-}
-
-function normalize(doc: CVDocument): CVDocument {
-  return {
-    ...doc,
-    content: coerceContent(doc.content),
-    design: coerceDesign(doc.design),
-  }
 }
 
 export const useCvStore = create<CvState>((setState, getState) => ({
@@ -59,8 +51,7 @@ export const useCvStore = create<CvState>((setState, getState) => ({
   saveState: 'saved',
   load: async () => {
     try {
-      const stored = (await get(KEY)) as CVDocument[] | undefined
-      setState({ docs: (stored ?? []).map(normalize), ready: true, saveState: 'saved' })
+      setState({ docs: readDocuments(localStorage), ready: true, saveState: 'saved' })
     } catch {
       setState({ ready: true })
       pushToast('Saved CVs could not be read from this browser.', 'warn')
@@ -157,9 +148,9 @@ export const useCvStore = create<CvState>((setState, getState) => ({
     queueSave()
   },
   importParsed: (result, options) => {
-    if (result.format === 'devistic') {
+    if (result.format === 'devistic' || result.design) {
       const doc = createDocument({
-        name: result.name || 'Imported CV',
+        name: result.name || result.content.personal.fullName || 'Imported CV',
         content: coerceContent(result.content),
         design: coerceDesign(result.design),
       })
@@ -181,5 +172,13 @@ export const useCvStore = create<CvState>((setState, getState) => ({
     setState((state) => ({ docs: [doc, ...state.docs], saveState: 'saving' }))
     queueSave()
     return { id: doc.id, notes: [...result.warnings, ...arranged.notes] }
+  },
+  clearLocal: () => {
+    try {
+      clearDevisticStorage(localStorage, sessionStorage)
+    } catch {
+      /* private mode */
+    }
+    setState({ docs: [], past: [], future: [], saveState: 'saved', ready: true })
   },
 }))

@@ -1,7 +1,7 @@
 import { ArrowLeft, Download, Keyboard, Printer, Redo2, Undo2 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { Logo } from '../components/Logo'
+import { BrandLockup } from '../components/BrandLockup'
 import { ThemeToggle } from '../components/ThemeToggle'
 import { Button, Menu, MenuItem, Modal } from '../components/ui'
 import { CheckPanel } from '../editor/CheckPanel'
@@ -10,8 +10,9 @@ import { ImportButton } from '../editor/fields'
 import { WritePanel } from '../editor/WritePanel'
 import { fitDesign } from '../lib/autoLayout'
 import type { CVDocument } from '../lib/types'
-import { downloadJson, downloadPdf, downloadPng, printResume } from '../lib/export'
+import { downloadJson, downloadJsonResume, downloadPdf, downloadPng, printResume } from '../lib/export'
 import { scoreCv } from '../lib/score'
+import { TIPS } from '../lib/tips'
 import { PreviewPane } from '../preview/PreviewPane'
 import { pushToast } from '../store/toast'
 import { useCvStore } from '../store/useCvStore'
@@ -37,7 +38,7 @@ const TOUR = [
   },
   {
     title: 'Export when it reads well',
-    body: 'Download a pixel-matched PDF or PNG, print a text PDF for older applicant systems, or keep a JSON copy.',
+    body: 'Download a pixel-matched PDF or PNG, print a text PDF for older applicant systems, or keep a Devistic JSON copy and a JSON Resume file.',
   },
 ]
 
@@ -60,7 +61,13 @@ export function EditorPage() {
   const [pane, setPane] = useState<'edit' | 'preview'>('edit')
   const [pages, setPages] = useState(1)
   const [help, setHelp] = useState(false)
-  const [tourStep, setTourStep] = useState<number | null>(null)
+  const [tourStep, setTourStep] = useState<number | null>(() => {
+    try {
+      return localStorage.getItem('devistic-tour-v1') ? null : 0
+    } catch {
+      return 0
+    }
+  })
   const [notes, setNotes] = useState<string[]>(() => {
     const state = location.state as { notes?: string[] } | null
     return state?.notes ?? []
@@ -69,10 +76,6 @@ export function EditorPage() {
   useEffect(() => {
     if (ready && !doc) navigate('/documents', { replace: true })
   }, [ready, doc, navigate])
-
-  useEffect(() => {
-    if (!localStorage.getItem('devistic-tour-v1')) setTourStep(0)
-  }, [])
 
   useEffect(() => {
     const onJump = (event: Event) => {
@@ -120,15 +123,15 @@ export function EditorPage() {
   const issues = scoreCv(doc).checks.filter((check) => check.severity === 'error' || check.severity === 'warn').length
 
   return (
-    <div className="print-root flex h-screen flex-col overflow-hidden bg-bg text-text">
+    <div className="print-root flex h-full min-h-0 flex-col overflow-hidden bg-bg text-text">
       <a className="skip-link no-print" href="#editor-panel">Skip to editor</a>
       <header className="no-print sticky top-0 z-30 border-b border-line bg-bg">
         <div className="flex flex-wrap items-center gap-2 px-3 py-2">
           <Link to="/documents" className="inline-flex items-center gap-2 rounded-md px-1 py-1 text-sm font-semibold text-muted hover:text-text" aria-label="Back to documents">
-            <Logo word={false} />
             <ArrowLeft size={16} aria-hidden />
             <span className="hidden sm:inline">Documents</span>
           </Link>
+          <BrandLockup nameTo="/" />
           <div className="min-w-0 flex-1">
             <input
               aria-label="CV name"
@@ -173,10 +176,12 @@ export function EditorPage() {
           >
             <MenuItem onSelect={() => void downloadPdf(doc).catch((error: Error) => pushToast(error.message, 'warn'))}>Download PDF</MenuItem>
             <MenuItem onSelect={() => void downloadPng(doc).catch((error: Error) => pushToast(error.message, 'warn'))}>Download PNG</MenuItem>
-            <MenuItem onSelect={() => downloadJson(doc)}>Download JSON</MenuItem>
+            <MenuItem onSelect={() => downloadJson(doc)}>Download Devistic JSON</MenuItem>
+            <MenuItem onSelect={() => downloadJsonResume(doc)}>Download JSON Resume</MenuItem>
             <MenuItem onSelect={() => printResume()}>
               <span className="inline-flex items-center gap-2"><Printer size={14} /> Print text PDF</span>
             </MenuItem>
+            <p className="px-2 py-2 text-xs leading-relaxed text-muted">{TIPS.jsonResume}</p>
           </Menu>
         </div>
         <nav aria-label="Breadcrumb" className="px-4 pb-2 text-xs text-muted">
@@ -204,7 +209,7 @@ export function EditorPage() {
       )}
       <div className="grid min-h-0 flex-1 lg:grid-cols-[minmax(320px,460px)_1fr]">
         <section id="editor-panel" className={`${pane === 'preview' ? 'hidden' : 'block'} no-print overflow-auto border-line px-4 py-4 lg:block lg:border-r`}>
-          <div className="mb-3 flex items-center justify-between gap-2">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <p className="text-xs font-semibold uppercase tracking-wide text-muted">Score {score}</p>
             <ImportButton
               onParsed={(result) => {
@@ -216,6 +221,7 @@ export function EditorPage() {
               Import file
             </ImportButton>
           </div>
+          <p className="mb-3 text-xs leading-relaxed text-muted">{TIPS.import}</p>
           {mode === 'write' && <WritePanel doc={doc} section={section} onSection={setSection} update={apply} />}
           {mode === 'design' && <DesignPanel doc={doc} update={apply} />}
           {mode === 'check' && (
