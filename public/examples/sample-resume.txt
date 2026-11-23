@@ -1,0 +1,36 @@
+JORDAN HALE
+Product Engineer
+Berlin, Germany
+jordan.hale@example.com | +49 151 23456789 | https://jordan.example.com | github.com/jordanhale
+
+SUMMARY
+Engineer who ships calm billing and design-system work for product teams. Ten years of taking fuzzy operational problems and leaving a smaller, faster path behind.
+
+EXPERIENCE
+Senior Product Engineer, Northwind
+Jan 2021 - Present · Berlin
+- Led the redesign of billing and reduced failed payments by 18%
+- Built a design system used by 14 squads
+- Cut release checks from 2 days to 4 hours
+
+Product Engineer — Lumen Lab
+2018 - 2020
+• Shipped the public API and the docs that sit next to it
+
+EDUCATION
+BSc Computer Science, Technical University of Berlin
+2014 - 2018
+
+SKILLS
+TypeScript, React, Node.js, PostgreSQL, Accessibility, React
+
+PROJECTS
+Harbor UI — https://harbor.example.com
+Component library and the docs that keep it honest.
+
+CERTIFICATIONS
+AWS Certified Developer, Amazon, 2022
+
+LANGUAGES
+English — Native
+German — Professional

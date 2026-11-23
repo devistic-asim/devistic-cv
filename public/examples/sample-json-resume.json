@@ -1,0 +1,35 @@
+{
+  "basics": {
+    "name": "Jordan Hale",
+    "label": "Product Engineer",
+    "email": "jordan.hale@example.com",
+    "phone": "+49 151 23456789",
+    "url": "https://jordan.example.com",
+    "summary": "Engineer who ships calm billing and design-system work for product teams.",
+    "location": { "city": "Berlin", "countryCode": "DE" },
+    "profiles": [{ "network": "GitHub", "url": "https://github.com/jordanhale" }]
+  },
+  "work": [
+    {
+      "name": "Northwind",
+      "position": "Senior Product Engineer",
+      "startDate": "2021-01",
+      "summary": "Owns billing and the design system.",
+      "highlights": ["Reduced failed payments by 18%", "Built a design system used by 14 squads"],
+      "location": "Berlin"
+    }
+  ],
+  "education": [
+    {
+      "institution": "Technical University of Berlin",
+      "area": "Computer Science",
+      "studyType": "BSc",
+      "startDate": "2014",
+      "endDate": "2018"
+    }
+  ],
+  "skills": [{ "name": "Web", "level": "Advanced", "keywords": ["TypeScript", "React"] }],
+  "languages": [{ "language": "English", "fluency": "Native" }],
+  "projects": [{ "name": "Harbor UI", "url": "https://harbor.example.com", "description": "Component library and docs." }],
+  "certificates": [{ "name": "AWS Certified Developer", "issuer": "Amazon", "date": "2022" }]
+}
