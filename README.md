@@ -61,7 +61,7 @@ A notice says this on the first visit. Dismissing it is remembered in `localStor
 
 Pushes to `main` run [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml). The workflow builds with base `/devistic-cv/`, copies `index.html` to `404.html` so client routes resolve, and deploys with GitHub Pages actions.
 
-The repository owner must set **Settings → Pages → Build and deployment → Source** to **GitHub Actions** before the first deploy can publish.
+The deploy workflow asks GitHub to turn Pages on and use Actions as the source. If that API call is refused, set **Settings → Pages → Build and deployment → Source** to **GitHub Actions** and re-run the failed deploy.
 
 ## Contributing
 
